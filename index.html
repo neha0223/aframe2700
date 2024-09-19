@@ -15,6 +15,11 @@
         depth="0.6"
         color="#FFF1FF" 
       ></a-box>
+      <a-entity 
+        thick-triangle="color: #FFF1FF; size: 0.25"
+        position="-1.5 0.10 -5.55"
+        rotation="90 0 180"
+      ></a-entity>
       <a-box
         position="-1.1 0.10 -5.15"
         radius="0.5"
@@ -188,6 +193,64 @@
         color="#BCBDB7"
       ></a-plane>
       <a-sky color="white"></a-sky>
+
+      <!--3D Triangle-->
+      <script>
+        AFRAME.registerComponent('thick-triangle', {
+          schema: {
+            color: { type: 'color', default: '#0000ff' },  // Default color is blue
+            size: { type: 'number', default: 1 }
+          },
+          init: function () {
+            var geometry = new THREE.BufferGeometry();
+
+            // Get size from the schema (default is 1)
+            var size = this.data.size;
+    
+            // Define vertices for two triangles (front and back) to create thickness
+            var vertices = new Float32Array([
+              // Front triangle (z = 0.1)
+              1.0 * size, 1.0 * size, 0.1 * size,   // Vertex 1
+              -1.0 * size, -1.0 * size, 0.1 * size, // Vertex 2
+              1.0 * size, -1.0 * size, 0.1 * size,  // Vertex 3
+              // Back triangle (z = -0.1)
+              1.0 * size, 1.0 * size, -0.1 * size,  // Vertex 4
+              -1.0 * size, -1.0 * size, -0.1 * size,// Vertex 5
+              1.0 * size, -1.0 * size, -0.1 * size  // Vertex 6
+            ]);
+    
+            // Attach vertices to the geometry
+            geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    
+            // Define indices for the faces (two triangles and connecting faces)
+            var indices = new Uint16Array([
+              // Front face (0.1)
+              0, 1, 2,
+              // Back face (-0.1)
+              3, 5, 4,
+              // Sides connecting front and back triangles
+              0, 3, 1,  1, 3, 4,  // Left side
+              1, 4, 2,  2, 4, 5,  // Bottom side
+              2, 5, 0,  0, 5, 3   // Right side
+            ]);
+    
+            // Attach the indices to form the faces
+            geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+    
+            // Create a material (color and double-sided)
+            var material = new THREE.MeshBasicMaterial({ color: this.data.color, side: THREE.DoubleSide });
+    
+            // Create the mesh (geometry + material)
+            var mesh = new THREE.Mesh(geometry, material);
+    
+            // Attach the mesh to the entity
+            this.el.setObject3D('mesh', mesh);
+          }
+        });
+    
+        // Add the custom thick triangle geometry to the entity
+        document.getElementById('thick-triangle').setAttribute('thick-triangle', '');
+      </script>
     </a-scene>
   </body>
 </html>
