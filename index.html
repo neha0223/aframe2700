@@ -4,6 +4,7 @@
   </head>
   <body>
     <a-scene>
+
       <!--First row -->
       
       <!--Left box -->
@@ -13,13 +14,25 @@
          rotation="0 0 0" 
          scale=".7 1.25 1.45"
          color="#fcdae8"
+         material="shader: flat"
        ></a-box>
+       <a-entity 
+        thick-triangle="color: #fcdae8; size: .35"
+        position="-3.35 2.87 -4.97"
+        rotation="0 180 0"
+      ></a-entity>
       <a-box 
          position="-2.65 1.9 -5" 
          rotation="0 0 0" 
          scale=".7 1.25 1.45"
          color="#f1c7c7"
+         material="shader: flat"
        ></a-box>
+       <a-entity 
+        thick-triangle="color: #f1c7c7; size: .35"
+        position="-2.65 2.87 -4.97"
+        rotation="0 0 0"
+      ></a-entity>
       
       <!--Middle box -->
       <a-box 
@@ -27,13 +40,25 @@
          rotation="0 0 0" 
          scale=".7 1.25 1.45"
          color="#fedfe7"
+         material="shader: flat"
        ></a-box>
+       <a-entity 
+        thick-triangle="color: #fedfe7; size: .35"
+        position="-1.55 2.87 -4.97"
+        rotation="0 180 0"
+      ></a-entity>
       <a-box 
          position="-0.85 1.9 -5" 
          rotation="0 0 0" 
          scale=".7 1.25 1.45"
          color="#fcbc39"
+         material="shader: flat"
        ></a-box>
+       <a-entity 
+        thick-triangle="color: #fcbc39; size: .35"
+        position="-0.85 2.87 -4.97"
+        rotation="0 0 0"
+      ></a-entity>
       
       <!--Right boxes -->
       
@@ -44,13 +69,25 @@
          rotation="0 0 0" 
          scale=".7 1.25 1.45"
          color="#fedfe7"
+         material="shader: flat"
        ></a-box>
+       <a-entity 
+        thick-triangle="color: #fedfe7; size: .35"
+        position="0.15 2.87 -4.97"
+        rotation="0 180 0"
+      ></a-entity>
       <a-box 
          position="0.85 1.9 -5" 
          rotation="0 0 0" 
          scale=".7 1.25 1.45"
          color="#fbbd26"
+         material="shader: flat"
        ></a-box>
+       <a-entity 
+        thick-triangle="color: #fbbd26; size: .35"
+        position="0.85 2.87 -4.97"
+        rotation="0 0 0"
+      ></a-entity>
       
       <!--2 -->
       <a-box 
@@ -58,13 +95,25 @@
          rotation="0 0 0" 
          scale=".7 1.25 1.45"
          color="#ffc5db"
+         material="shader: flat"
        ></a-box>
+       <a-entity 
+        thick-triangle="color: #ffc5db; size: .35"
+        position="1.55 2.87 -4.97"
+        rotation="0 180 0"
+      ></a-entity>
       <a-box 
          position="2.25 1.9 -5" 
          rotation="0 0 0" 
          scale=".7 1.25 1.45"
          color="#fdc340"
+         material="shader: flat"
        ></a-box>
+       <a-entity 
+        thick-triangle="color: #fdc340; size: .35"
+        position="2.25 2.87 -4.97"
+        rotation="0 0 0"
+      ></a-entity>
       
       <!--3 -->
       <a-box 
@@ -72,7 +121,13 @@
          rotation="0 0 0" 
          scale=".7 1.25 1.45"
          color="#ffc7e1"
+         material="shader: flat"
        ></a-box>
+       <a-entity 
+        thick-triangle="color: #ffc7e1; size: .35"
+        position="2.95 2.87 -4.97"
+        rotation="0 180 0"
+      ></a-entity>
       
       <!--Second row -->
       
@@ -531,10 +586,58 @@
       <a-plane
         position="0 0 -5"
         rotation="0 0 0"
-        width="11"
-        height="14"
+        width="9"
+        height="12"
         color="#BCBDB7"
       ></a-plane>
+
+       <!--3D Triangle-->
+       <script>
+        AFRAME.registerComponent('thick-triangle', {
+          schema: {
+            color: { type: 'color', default: '#0000ff' },
+            size: { type: 'number', default: 1 }
+          },
+          init: function () {
+            var geometry = new THREE.BufferGeometry();
+        
+            var size = this.data.size;
+            
+            // Updated z-values for front and back faces to match box depth (1.45)
+            var vertices = new Float32Array([
+              // Front triangle (depth: 1.45 / 2)
+              1.0 * size, 1.0 * size, 2 * size, 
+              -1.0 * size, -1.0 * size, 2 * size,
+              1.0 * size, -1.0 * size, 2 * size,
+              // Back triangle (depth: -1.45 / 2)
+              1.0 * size, 1.0 * size, -2 * size,
+              -1.0 * size, -1.0 * size, -2 * size,
+              1.0 * size, -1.0 * size, -2 * size
+            ]);
+        
+            geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+        
+            var indices = new Uint16Array([
+              // Front face
+              0, 1, 2,
+              // Back face
+              3, 5, 4,
+              // Sides
+              0, 3, 1,  1, 3, 4,
+              1, 4, 2,  2, 4, 5,
+              2, 5, 0,  0, 5, 3
+            ]);
+        
+            geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+        
+            var material = new THREE.MeshBasicMaterial({ color: this.data.color, side: THREE.DoubleSide });
+        
+            var mesh = new THREE.Mesh(geometry, material);
+            
+            this.el.setObject3D('mesh', mesh);
+          }
+        });
+        </script>
       
       <a-sky color="#cecdc9"></a-sky>
     </a-scene>
